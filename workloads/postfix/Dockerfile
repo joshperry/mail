@@ -1,3 +1,5 @@
-FROM alpine:3.8
+FROM alpine:edge
 
 RUN apk --no-cache add postfix
+
+ENTRYPOINT ["postfix", "start-fg"]

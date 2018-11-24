@@ -1,0 +1,6 @@
+resources:
+  - workloads/dovecot/deployment.yaml
+  - workloads/dovecot/service-monitor.yaml
+
+  - workloads/postfix/deployment.yaml
+  - workloads/postfix/service-monitor.yaml

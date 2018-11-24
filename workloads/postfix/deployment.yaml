@@ -1,0 +1,32 @@
+apiVersion: extensions/v1
+kind: Deployment
+metadata:
+  name: postfix
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+
+        - image: joshperry/kube-postfix
+          name: postfix
+          ports:
+            - name: smtp
+              containerPort: 25
+            - name: submission
+              containerPort: 587
+          volumeMounts:
+            - name: ssl-secrets
+              mountPath: /var/secure/ssl
+              readOnly: true
+
+        - image: joshperry/postfix-exporter
+          name: postfix-exporter
+          ports:
+            - name: metrics
+              containerPort: 9166
+
+      volumes:
+        - name: ssl-secrets
+          secret:
+            secretName: ssl-secrets

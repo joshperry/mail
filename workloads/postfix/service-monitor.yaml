@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: postfix
+  namespace: monitoring
+  labels:
+    prometheus: monitoring
+spec:
+  jobLabel: postfix
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      app: postfix
+  endpoints:
+    - port: metrics

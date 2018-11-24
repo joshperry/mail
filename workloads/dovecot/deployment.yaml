@@ -1,0 +1,33 @@
+apiVersion: extensions/v1
+kind: Deployment
+metadata:
+  name: dovecot
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+
+        - image: joshperry/kube-dovecot
+          name: dovecot
+          ports:
+            - name: imap
+              containerPort: 143
+            - name: imaps
+              containerPort: 993
+          volumeMounts:
+            - name: ssl-secrets
+              mountPath: /var/secure/ssl
+              readOnly: true
+
+        - image: joshperry/dovecot-exporter
+          name: dovecot-exporter
+          ports:
+            - name: metrics
+              containerPort: 9166
+
+      volumes:
+
+        - name: ssl-secrets
+          secret:
+            secretName: ssl-secrets

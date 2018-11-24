@@ -1,7 +1,7 @@
 FROM golang:1.11-alpine3.8
 
 RUN apk add --no-cache git && \
-    go get -v github.com/kumina/dovecot_exporter && \
+    go get -d -v github.com/kumina/dovecot_exporter && \
 	cd /go/src/github.com/kumina/dovecot_exporter && \
     go build 
 

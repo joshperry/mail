@@ -1,3 +1,3 @@
 FROM alpine:3.8
 
-apk --no-cache add postgrey
+RUN apk --no-cache add postgrey

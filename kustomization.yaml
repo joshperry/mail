@@ -4,3 +4,9 @@ resources:
 
   - workloads/postfix/deployment.yaml
   - workloads/postfix/service-monitor.yaml
+
+  - workloads/couchmail/deployment.yaml
+
+  - workloads/couchdb/deployment.yaml
+
+  - workloads/greylist/deployment.yaml

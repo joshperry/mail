@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: couchmail
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: couchmail
+  template:
+    metadata:
+      labels:
+        app: couchmail
+    spec:
+      containers:
+        - image: joshperry/couchauthnode
+          name: couchmail
+          ports:
+            - name: imap
+              containerPort: 143
+            - name: imaps
+              containerPort: 993
+          volumeMounts:
+            - name: ssl-secrets
+              mountPath: /var/secure/ssl
+              readOnly: true
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+      volumes:
+        - name: ssl-secrets
+          secret:
+            secretName: ssl-secrets

@@ -1,0 +1,7 @@
+bases:
+  - postfix
+  - opendkim
+    #- dovecot/deployment.yaml
+    #- couchmail/deployment.yaml
+    #- couchdb/deployment.yaml
+    #- greylist/deployment.yaml

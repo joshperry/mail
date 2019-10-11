@@ -1,0 +1,13 @@
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: postfix
+spec:
+  selector:
+    app: postfix
+  ports:
+    - name: smtp
+      port: 25
+    - name: submission
+      port: 587
+  type: LoadBalancer

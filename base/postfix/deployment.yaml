@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postfix
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postfix
+  template:
+    metadata:
+      labels:
+        app: postfix
+    spec:
+      containers:
+
+        - image: joshperry/kube-postfix
+          name: postfix
+          ports:
+            - name: smtp
+              containerPort: 25
+            - name: submission
+              containerPort: 587
+          volumeMounts:
+            - name: ssl-secrets
+              mountPath: /var/secure/ssl
+            - name: config
+              mountPath: /etc/postfix/master.cf
+              subPath: master.cf
+            - name: config
+              mountPath: /etc/postfix/main.cf
+              subPath: main.cf
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+
+      volumes:
+        - name: config
+          configMap:
+            name: postfix-config
+        - name: ssl-secrets
+          secret:
+            secretName: tlspki

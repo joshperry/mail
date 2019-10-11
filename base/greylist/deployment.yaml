@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: greylist
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: greylist
+  template:
+    metadata:
+      labels:
+        app: greylist
+    spec:
+      containers:
+
+        - image: joshperry/kube-postgrey
+          name: postgrey
+          ports:
+            - name: greylist
+              containerPort: 10030
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "10m"
+            limits:
+              memory: "128Mi"
+              cpu: "50m"

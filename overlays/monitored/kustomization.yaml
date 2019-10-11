@@ -1,0 +1,8 @@
+bases:
+  - ../../base
+resources:
+  - postfix/service-monitor.yaml
+  - dovecot/service-monitor.yaml
+patchesStrategicMerge:
+  - postfix/deployment-patch.yaml
+  - dovecot/deployment-patch.yaml

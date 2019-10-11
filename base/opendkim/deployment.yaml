@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opendkim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opendkim
+  template:
+    metadata:
+      labels:
+        app: opendkim
+    spec:
+      containers:
+
+        - image: joshperry/kube-opendkim
+          name: opendkim
+          ports:
+            - name: smtp
+              containerPort: 25
+            - name: submission
+              containerPort: 587
+          volumeMounts:
+            - name: config
+              mountPath: /etc/opendkim/opendkim.conf
+              subPath: opendkim.conf
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "10m"
+            limits:
+              memory: "250Mi"
+              cpu: "500m"
+
+      volumes:
+        - name: config
+          configMap:
+            name: opendkim-config

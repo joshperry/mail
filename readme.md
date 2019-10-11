@@ -65,7 +65,7 @@ If the user catches ham in the Spam folder or spam in the Inbox, the user can mo
 - Monitoring (prometheus, grafana)
 - Helm?
 
-## Implementation
+# Implementation
 
 We'll be using alpine docker containers running on a kubernetes cluster.
 
@@ -75,13 +75,122 @@ The images for each of the service containers will be hosted on (and built by) d
 We will try to make all services run within a resource-constrained micro instance.
 Some services may be optional (e.g. monitoring) in order to stay within this target footprint.
 
-### Base Image
+## Base Image
 
 We're using Alpine Linux as our base OS image. The main reason is the small size and high-quality (and blazing fast) packaging system.
 
-### Configuration
+## Configuration
 
 The default configuration should be enough for most mail handling systems of a reasonable size.
 However, each of the pods will watch for custom config maps which can be used to override the default service configs.
 
 When a config map for a service is changed, the pod will detect that and automatically reload or restart to effect the change.
+
+### Configurables
+While as many things as possible are generated, a number of values can be configured when generating the stack.
+
+project:
+region:
+zone:
+email: The email for the domain administrator (used for letsencrypt)
+domain: The domain for this email server, example.com is used in examples throughout.
+
+
+### DNS
+A common method in simple DNS setups is to CNAME `mail` to your root domain and add records there:
+
+```
+A example.com <public-cluster-ip>
+CNAME mail example.com
+MX example.com mail.example.com
+TXT dkim._domainkey v=DKIM1; k=...; p=...
+TXT example.com 
+```
+
+### opendkim
+OpenDKIM verifies DKIM-signed inbound messages and signs outbound messages.
+The private key for opendkim represents this server's identity. This identity is then trusted by entries in DNS.
+
+#### files
+/etc/opendkim/opendkim.config: config file for opendkim
+/var/secure/dkim.private: private key for signing outgoing messages
+#### sockets
+8891: milter service internal cluster port that verifies/signs messages
+
+### dovecot
+
+### postfix
+
+main.cf
+master.cf
+
+
+## Network Policy
+We want to control network policy using kubernetes to ensure that containers can only talk where we allow.
+
+### Internal
+postfix -> opendkim port 8891 - dkim filter
+postfix -> postgrey port 10030 - greyfilter
+postfix -> couchmail port 40571 - domain db
+postfix -> couchmail port 40572 - mailbox db
+postfix -> couchmail port 40573 - alias db
+postfix -> dovecot port 12345 - dovecot sasl auth
+postfix -> dovecot port 2424 - lmtp message delivery
+postfix -> spamd port 783 - spamc client connection
+dovecot -> couchmail port 40574 - socat proxy from dovecot dict proxy socket
+spamd -> opendkim port 8891
+
+### External 
+postfix -> inet port 25 - outbound mail delivery
+letsencrypt -> inet port 443 - TLS certificate signing
+spamd -> inet port 53 - DNS for checking RBLs
+inet port 25 -> postfix - inbound mail delivery
+inet port 587 -> postfix - client mail submission
+inet port 143 -> dovecot - email client connection
+?inet port 443 -> roundcube
+?roundcube -> dovecot port 143 - email client
+
+
+## Let's Encrypt
+We want to automate the process of retrieving any required publicly-signed certs using Let's Encrypt, stuffing the results into a k8s secret.
+
+After an initial issuance, certbot stores the renewal config in /
+/etc/letsencrypt/renewal/6bit.com.conf
+
+### Needed Certs
+SMTPS for TLS specified in postfix/main.cf
+IMAPS for TLS specified in dovecot/conf.d/10-ssl.conf
+TODO: HTTPS for webmail
+
+# A Good Mail System
+
+It seems desirable to continue having a presence on the SMTP network.
+It is still a primary mode for many transactional and financial communications. Why?
+
+## Open
+
+The primary reasons a target email user need not reside in the same logical or physical domain as the source user, are the opinionated set of coordinating conventions that we call standards.
+
+The physical, addressing, and transport-layer standards that enabled the heterogeneous singularity that spawned our modern packet-switched Internet are a good analog for the application layer standards that define the public discovery and communication interfaces for email server software.
+Allowing for the free and open interconnection of heterogeneous software running the application layer of the SMTP network was a key to its success and a driver for its staying power.
+
+Through modern extensions for encrypted communication and the identification of authoritative server instances, the SMTP network has continued to be used for high-value communications like financial interactions and identity verification.
+
+This openness, however, has also seen many of the same problems that the baser Internet standards struggled with.
+As more and varied users connect their networks to the global communications web and the network effects of return-on-attack by motivated entities, we see abuse of network resources and affinity fraud for mostly illicit financial gain.
+
+## Goals
+
+We want to communicate, in a secure fashion, with other email network users.
+We want to ensure the identity of a message sender to the greatest level possible.
+We want to assert our identity to the greatest level possible.
+We want our stored communications to be resistant to inspection by either a remote, local, or midspan attacker.
+We want our communication system to be resistant to failure of physical or logical resources.
+We want to drive diversification of the email network by creating an email system that can be deployed and managed by anyone.
+We want a system that can be easily iterated and updated to keep pace with security and feature changes in the email application layer.
+We want to be able to support authoritative instances for the routing, storage, and delivery of any number of email domains.
+We want each user to be able to script the acceptance and collation criteria for email messages.
+We want messages to be analyzed for UCE, forging, and illicit contents.
+We want to make end-to-end high-assurance identity and confidentiality a realistic default use-case for anyone.
+
+## Needs

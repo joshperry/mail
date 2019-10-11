@@ -1,0 +1,11 @@
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: opendkim
+spec:
+  selector:
+    app: opendkim
+  ports:
+    - name: service
+      port: 8891
+  type: LoadBalancer

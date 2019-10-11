@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postfix
+spec:
+  template:
+    spec:
+      containers:
+
+        - image: joshperry/postfix-exporter
+          name: postfix-exporter
+          ports:
+            - name: metrics
+              containerPort: 9166
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "100m"

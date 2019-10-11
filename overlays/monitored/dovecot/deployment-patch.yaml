@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dovecot
+spec:
+  template:
+    spec:
+      containers:
+        - image: joshperry/dovecot-exporter
+          name: dovecot-exporter
+          ports:
+            - name: metrics
+              containerPort: 9166
+          resources:
+            requests:
+              memory: "16Mi"
+              cpu: "10m"
+            limits:
+              memory: "64Mi"
+              cpu: "50m"

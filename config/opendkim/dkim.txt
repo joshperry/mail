@@ -1,0 +1,2 @@
+dkim._domainkey	IN	TXT	( "v=DKIM1; k=rsa; "
+	  "p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCyMmYS+Az0Y4v1ap8q2t9oGgj2rp9yRJhDB34sIOa6eDc1Oacr2afU50FpHdjgoO1UG8bANDZ7tWrWT3YNnLAiDQYCse8UHaKS8UgHCLurfIrdZmKIhUABP9ev+JMcHujbljDbWhmJloiaXWbjihDtjXdlkNVpFdkNgJCVHfVYowIDAQAB" )  ; ----- DKIM key dkim for (your domain)
